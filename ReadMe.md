@@ -107,7 +107,7 @@ Accepted at BIOINFORMATICS 2023 - 14th International Conference on Bioinformatic
 
 ### BibTeX
 ```BibTeX
-@inproceedings{Mian2023EfficientHO,
+@inproceedings{Mian2023Efficient,
   title={Efficient Hashing of Multiple Spaced Seeds with Application},
   author={Eleonora Mian and Enrico Petrucci and Cinzia Pizzi and Matteo Comin},
   booktitle={Bioinformatics},
