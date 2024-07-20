@@ -5,7 +5,7 @@ LIBS :=
 DEBUG_DIR := ./debug
 BUILD_DIR := ./build
 SOURCE_DIR := ./src
-CC = g++
+CC = g++-13
 
 
 # if make debug was called, define directories accordingly and add -g flag
@@ -45,9 +45,9 @@ endif
 
 
 # all target
-all: $(BUILD_DIR)/ISSH
+all: $(BUILD_DIR)/MISSH
 
-$(BUILD_DIR)/ISSH: $(OBJS) $(USER_OBJS)
+$(BUILD_DIR)/MISSH: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
 	$(CC) -o "$@" $(OBJS) $(USER_OBJS) $(LIBS) -fopenmp
@@ -56,9 +56,9 @@ $(BUILD_DIR)/ISSH: $(OBJS) $(USER_OBJS)
 
 
 # debug target
-debug: $(DEBUG_DIR)/ISSH
+debug: $(DEBUG_DIR)/MISSH
 
-$(DEBUG_DIR)/ISSH: $(OBJS) $(USER_OBJS)
+$(DEBUG_DIR)/MISSH: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
 	$(CC) -o "$@" $(OBJS) $(USER_OBJS) $(LIBS) -fopenmp
