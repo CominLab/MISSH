@@ -7,15 +7,14 @@ We report the results on several tests which show that our methods
 significantly outperform the previously proposed algorithms, with a speedup that can reach 20x. 
 We also apply these efficient spaced seeds hashing algorithms to an application in the field of metagenomic, the classification of reads performed by Clark-S, and we shown that a significant speedup can be obtained, thus resolving the slowdown introduced by the use of multiple spaced seeds.
 
----
 
 
-
+## Software overview
 The purpose of this program is to benchmark different approaches that solve the problem of computing the hashing of DNA sequences by using spaced seeds.
-The original code was written by Samuele Girotto for the paper that presented the FSH approach ([paper](http://www.dei.unipd.it/~ciompin/main/fsh.html), [repo](https://bitbucket.org/samu661/fsh/src/master/)), was later modified by Enrico Petrucci by adding the implementation of the ISSH, first for the version single seed ([paper and repo](http://www.dei.unipd.it/~ciompin/main/issh.html)), and then -
+The original code was written by Samuele Girotto for the paper that presented the FSH approach ([paper](http://www.dei.unipd.it/~ciompin/main/fsh.html) and [repo](https://bitbucket.org/samu661/fsh/src/master/)), was later modified by Enrico Petrucci by adding the implementation of the ISSH, first for the version single seed ([paper and repo](http://www.dei.unipd.it/~ciompin/main/issh.html)), and then -
 together with Eleonora Miani - by adding the version supporting multiple spaced seeds at the same time.
 
-The datasets used for testing are available at: https://bitbucket.org/samu661/metaprob/src/master/
+The datasets used for testing are available at the following [link](https://bitbucket.org/samu661/metaprob/src/master/).
 
 
 To compile the program open the terminal inside the main folder and use:
@@ -47,7 +46,6 @@ Usage:
 
 
 ### Execution parameters:
-
 - `-s` or `--si` followed by the relative path of the file containing the single_end sequence.
 ```sh    
 $ ./MISSH --si ../TestInputFile/reads_800.fa
@@ -95,13 +93,41 @@ All the examples use test files which are present in this program.
 
 Please note that the hashing results are not saved, but are discarded once computed in order to require only a small amount of memory. This is reasonable because we are interested in the time required for the computation and not in obtaining the resulting hashing.
 
-Citation
----------
+
+## Paper
+Paper is available on this [link](https://api.semanticscholar.org/CorpusID:257356222).
+
+
+## Citation
 Efficient Hashing of Multiple Spaced Seeds with Application
 
 Eleonora Miani, Enrico Petrucci, Cinzia Pizzi and Matteo Comin
 
 Accepted at BIOINFORMATICS 2023 - 14th International Conference on Bioinformatics Models, Methods and Algorithms
 
+### BibTeX
+```BibTeX
+@book{exampleBook,
+  author    = {John Doe},
+  title     = {Example Book Title},
+  publisher = {Example Publisher},
+  year      = {2023},
+  address   = {Example City},
+  edition   = {1st},
+}
+```
 
+### MLA
+```MLA
+Mian, Eleonora et al. “Efficient Hashing of Multiple Spaced Seeds with Application.” Bioinformatics (2023).
+```
 
+### APA
+```APA
+Mian, E., Petrucci, E., Pizzi, C., & Comin, M. (2023). Efficient Hashing of Multiple Spaced Seeds with Application. Bioinformatics.
+```
+
+### Chicago
+```Chicago
+Mian, Eleonora, Enrico Petrucci, Cinzia Pizzi and Matteo Comin. “Efficient Hashing of Multiple Spaced Seeds with Application.” Bioinformatics (2023).
+```
