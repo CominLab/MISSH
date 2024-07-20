@@ -54,7 +54,7 @@ $ ./MISSH --si ../TestInputFile/reads_800.fa
 - `-p` or `--pi` followed by the two relative paths of the two files containing the paired_end sequence.
  
 ```sh   
-$ ./MISSH --pi ../TestInputFile/paired.fna.1 ../TestInputFile/paired.fna.2
+$ ./MISSH --pi ../TestInputFile/paired.fna.1,../TestInputFile/paired.fna.2
 ```
     
 - `-d` or `--dirO` followed by the relative path where the program will save the processing times. Default: ../output/
