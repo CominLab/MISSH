@@ -18,13 +18,13 @@ int main(int argc, char* argv[]) {
 	cxxopts::Options options(argv[0], "Efficient Hashing of Multiple Spaced Seeds with Application");
 
 	options.add_options()
-		("s,si", "Input filename single-end", cxxopts::value<std::string>())
-		("p,pi", "Input filenames paired-end", cxxopts::value<std::vector<std::string>>())
-		("q,ss", "Spaced seeds path", cxxopts::value<std::string>())
-		("d,dirO", "Output directory", cxxopts::value<std::string>())
-		("n,num", "Number of previous hashes", cxxopts::value<int>())
-		("t,test", "Test kind (single or multi)", cxxopts::value<std::string>())
-		("m,threads", "Number of threads", cxxopts::value<int>())
+		("s,si", "Input filename single-end (--si <AbsPathFile>)", cxxopts::value<std::string>())
+		("p,pi", "Input filenames paired-end (--pi <AbsPathFile1>,<AbsPathFile2>)", cxxopts::value<std::vector<std::string>>())
+		("q,ss", "Spaced seeds path (--ss <AbsPathFile>)", cxxopts::value<std::string>())
+		("d,dirO", "Output directory (--dirO <AbsPathDir>)", cxxopts::value<std::string>())
+		("n,num", "Number of previous hashes (--num <number>)", cxxopts::value<int>())
+		("t,test", "Test kind: single or multi (--test <kind>  or nothing for performing both tests)", cxxopts::value<std::string>())
+		("m,threads", "Number of threads (--threads <number>)", cxxopts::value<int>())
 		("h,help", "Print help");
 
 	
@@ -40,7 +40,7 @@ int main(int argc, char* argv[]) {
 		if (result.count("si")) {
 			std::string input = result["si"].as<std::string>();
 			if (!param.init(input, "")) {
-				std::cerr << "Please enter an input filename single-end: -si <AbsPathFile>" << std::endl;
+				std::cerr << "Please enter an input filename single-end: --si <AbsPathFile>" << std::endl;
 				std::cout << options.help() << std::endl;
 				return 0;
 			}
@@ -50,7 +50,7 @@ int main(int argc, char* argv[]) {
 		if (result.count("pi")) {
 			std::vector<std::string> inputs = result["pi"].as<std::vector<std::string>>();
 			if (inputs.size() != 2 || !param.init(inputs[0], inputs[1])) {
-				std::cerr << "Please enter input filenames paired-end: -pi <AbsPathFile1>,<AbsPathFile2>" << std::endl;
+				std::cerr << "Please enter input filenames paired-end: --pi <AbsPathFile1>,<AbsPathFile2>" << std::endl;
 				std::cout << options.help() << std::endl;
 				return 0;
 			}
@@ -74,8 +74,8 @@ int main(int argc, char* argv[]) {
 			}
 		}
 
-		if (result.count("q")) {
-			std::string pathQmers = result["q"].as<std::string>();
+		if (result.count("ss")) {
+			std::string pathQmers = result["ss"].as<std::string>();
 			std::vector<std::string> lines;
 			if (getLines(pathQmers, lines)) {
 				std::vector<bool> correctQmer(lines.size(), false);
@@ -91,7 +91,7 @@ int main(int argc, char* argv[]) {
 					}
 				}
 			} else {
-				std::cerr << "Please enter a spaced seeds path as -q <AbsPathFile>. Every file's line must contain a spaced seeds." << std::endl;
+				std::cerr << "Please enter a spaced seeds path as --ss <AbsPathFile>. Every file's line must contain a spaced seeds." << std::endl;
 				std::cout << options.help() << std::endl;
 				return 0;
 			}
@@ -113,7 +113,7 @@ int main(int argc, char* argv[]) {
 			} else if (testValue == "multi") {
 				test_kind = 1;
 			} else {
-				std::cerr << "Please enter valid value (single or multi). Do not write -test and its option to perform both tests." << std::endl;
+				std::cerr << "Please enter valid value (single or multi). Do not write --test and its option to perform both tests." << std::endl;
 				std::cout << options.help() << std::endl;
 				return 0;
 			}
