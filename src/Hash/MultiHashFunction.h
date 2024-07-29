@@ -539,27 +539,25 @@ inline static void GetHashes_with_ISSH_multi_col_parallel
 		}
 		// compute a column at a time
 		
-		int offset; // declared as a private variable for each thread 
-		#pragma omp parallel private(offset)// num_threads(thread_num) 
+		#pragma omp parallel
 		{
 			int thread_num = omp_get_num_threads();
-			offset = 0; // declared as a private variable for each thread
+			int offset = 0; // declared as a private variable for each thread
 
 			#pragma omp for schedule(static, (int)ceil((n_hashes+0.0)/thread_num))
 			for(size_t i = 0; i < (size_t)n_hashes; i++)
 			{	
-				compute_hash_with_ISSH_multi_col_parallel(i, offset, VV_shifts, vvHash, s_Str, fConvertion);
-				offset++;
+				#pragma omp critical
+				{
+					compute_hash_with_ISSH_multi_col_parallel(i, offset, VV_shifts, vvHash, s_Str, fConvertion);
+					offset++;
+				}
 			}
 		}
 	}
 	else
-	{
 		for(size_t j = 0; j < VV_shifts.size(); j++)
-		{
 			vvHash[j].clear();
-		}
-	}
 }
 
 

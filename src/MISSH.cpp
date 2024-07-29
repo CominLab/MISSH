@@ -1,79 +1,60 @@
 //============================================================================
-// Name        : ISSH.cpp
+// Name        : MISSH.cpp
 //============================================================================
 
 #include "Test/Test.h"
+#include "cxxopts.hpp"
+
 
 int main(int argc, char* argv[]) {
 	string dir_output = "../output/";
 	bool sequence = false;
 	FileParameter param;
 	omp_set_num_threads(4);	
-	// default setting: performs the test multi
 	int test_kind = 2;
 
-	for(int i=1; i<argc; i++)
+
+	
+	cxxopts::Options options(argv[0], "Efficient Hashing of Multiple Spaced Seeds with Application");
+
+	options.add_options()
+		("s,si", "Input filename single-end (--si <AbsPathFile>)", cxxopts::value<std::string>())
+		("p,pi", "Input filenames paired-end (--pi <AbsPathFile1>,<AbsPathFile2>)", cxxopts::value<std::vector<std::string>>())
+		("q,ss", "Spaced seeds path (--ss <AbsPathFile>)", cxxopts::value<std::string>())
+		("d,dirO", "Output directory (--dirO <AbsPathDir>)", cxxopts::value<std::string>())
+		("n,num", "Number of previous hashes (--num <number>)", cxxopts::value<int>())
+		("t,test", "Test kind: single or multi (--test <kind>  or nothing for performing both tests)", cxxopts::value<std::string>())
+		("m,threads", "Number of threads (--threads <number>)", cxxopts::value<int>())
+		("h,help", "Print help");
+
+	
+	try
 	{
-		if(strcmp(argv[i], "-si") == 0)
-		{
-			i++;
-			if(!param.init(argv[i], ""))
-			{
-				cerr<<endl<<"Please enter an input filename single-end: -si <AbsPathFile>"<<flush;
+		auto result = options.parse(argc, argv);
+
+		if (result.count("help")) {
+			std::cout << options.help() << std::endl;
+			return 0;
+		}
+
+		if (result.count("si")) {
+			std::string input = result["si"].as<std::string>();
+			if (!param.init(input, "")) {
+				std::cerr << "Please enter an input filename single-end: --si <AbsPathFile>" << std::endl;
+				std::cout << options.help() << std::endl;
 				return 0;
 			}
 			sequence = true;
 		}
-		else if(strcmp(argv[i], "-pi") == 0)
-		{
-			i++;
-			if(!param.init(argv[i], argv[i+1]))
-			{
-				cerr<<endl<<"Please enter an input filenames paired-end: -pi <AbsPathFile1> <AbsPathFile2>\n"<<flush;
+
+		if (result.count("pi")) {
+			std::vector<std::string> inputs = result["pi"].as<std::vector<std::string>>();
+			if (inputs.size() != 2 || !param.init(inputs[0], inputs[1])) {
+				std::cerr << "Please enter input filenames paired-end: --pi <AbsPathFile1>,<AbsPathFile2>" << std::endl;
+				std::cout << options.help() << std::endl;
 				return 0;
 			}
 			sequence = true;
-		}
-		else if(strcmp(argv[i], "-q") == 0)
-		{
-			i++;
-			vector<string> lines;
-			string pathQmers(argv[i]);
-			if(getLines(pathQmers, lines))
-			{
-				vector<bool> correctQmer(lines.size(), false);
-				regex rgx("^1(0|1)*1$");
-				for(size_t i = 0; i < lines.size(); i++)
-				{
-					correctQmer[i] = regex_match(lines[i], rgx);
-					if(!correctQmer[i])
-					{
-						cerr<<endl<<"Error on " << to_string(i+1) << "° spaced seed. Enter q-mer with 1 at begin and end of the string on input files. "
-						"Ex. 1**1*11*1. 1 is the simbol considered, any others are not valid simbols.\n"<<flush;
-						return 0;
-					}
-					else
-					{
-						param.addSpacedQmer(lines[i], lines[i]);
-					}
-				}
-			}
-			else
-			{
-				cerr<<endl<<"Please enter a spaced seeds path as -q <AbsPathFile>. Every file's line must contain a spaced seeds.\n"<<flush;
-				return 0;
-			}
-		}
-		else if(strcmp(argv[i], "-dirO") == 0)
-		{
-			i++;
-			if(string(argv[i]) == "")
-			{
-				cerr<<endl<<"Enter valid path for output directory.\n"<<flush;
-				return 0;
-			}
-			else
-				dir_output = argv[i];
 		}
 
 		// Con questo comando è possibile fare in modo che invece di recuperare
@@ -82,58 +63,88 @@ int main(int argc, char* argv[]) {
 		// recuperabili con quegli hash.
 		// Attenzione! Deve essere impostato prima di -q, altrimenti non ha alcun
 		// effetto.
-		else if(strcmp(argv[i], "-num") == 0)
-		{
-			i++;
-			const char* s_num_prev(argv[i]);
-			if(!isdigit(s_num_prev[0]))
-			{
-				cerr<<endl<<"Please enter valid number of previous hashes from which retrive positions.\n"<<flush;
+		if (result.count("num")) {
+			int numPrev = result["num"].as<int>();
+			if (numPrev <= 0) {
+				std::cerr << "Please enter valid number of previous hashes from which to retrieve positions." << std::endl;
+				std::cout << options.help() << std::endl;
 				return 0;
+			} else {
+				param.setNumPrev(static_cast<size_t>(numPrev));
 			}
-			else
-			param.setNumPrev((size_t)atoi(s_num_prev));
 		}
 
-		else if(strcmp(argv[i], "-test") == 0)
-		{
-			i++;
-			if(strcmp(argv[i], "single") == 0)
-			{	
-				test_kind = 0;
-			}
-			else
-			{
-				if(strcmp(argv[i], "multi") == 0)
-				{	
-					test_kind = 1;
+		if (result.count("ss")) {
+			std::string pathQmers = result["ss"].as<std::string>();
+			std::vector<std::string> lines;
+			if (getLines(pathQmers, lines)) {
+				std::vector<bool> correctQmer(lines.size(), false);
+				std::regex rgx("^1(0|1)*1$");
+				for (size_t j = 0; j < lines.size(); j++) {
+					correctQmer[j] = std::regex_match(lines[j], rgx);
+					if (!correctQmer[j]) {
+						std::cerr << "Error on " << j + 1 << "° spaced seed. Enter q-mer with 1 at begin and end of the string on input files. "
+								<< "Ex. 1**1*11*1. 1 is the symbol considered, any others are not valid symbols." << std::endl;
+						return 0;
+					} else {
+						param.addSpacedQmer(lines[j], lines[j]);
+					}
 				}
-				else
-				{
-					cerr<<endl<<"Please enter valid value (single or multi), both tests will be performed.\n"<<flush;
-				}	
-			}
-  		}
-		else if(strcmp(argv[i], "-threads") == 0)
-		{
-			i++;
-			const char* threads_num = argv[i];
-			if(!isdigit(threads_num[0]))
-			{
-				cerr<<endl<<"Please enter valid number of previous hashes from which retrive positions.\n"<<flush;
+			} else {
+				std::cerr << "Please enter a spaced seeds path as --ss <AbsPathFile>. Every file's line must contain a spaced seeds." << std::endl;
+				std::cout << options.help() << std::endl;
 				return 0;
 			}
-			else
-			omp_set_num_threads(atoi(threads_num));
+		}
 
-		}		
+		if (result.count("dirO")) {
+			dir_output = result["dirO"].as<std::string>();
+			if (dir_output.empty()) {
+				std::cerr << "Enter valid path for output directory." << std::endl;
+				std::cout << options.help() << std::endl;
+				return 0;
+			}
+		}
 
+		if (result.count("test")) {
+			std::string testValue = result["test"].as<std::string>();
+			if (testValue == "single") {
+				test_kind = 0;
+			} else if (testValue == "multi") {
+				test_kind = 1;
+			} else {
+				std::cerr << "Please enter valid value (single or multi). Do not write --test and its option to perform both tests." << std::endl;
+				std::cout << options.help() << std::endl;
+				return 0;
+			}
+		}
+
+		if (result.count("threads")) {
+			int threads_num = result["threads"].as<int>();
+			if (threads_num <= 0) {
+				std::cerr << "Please enter valid number of threads." << std::endl;
+				std::cout << options.help() << std::endl;
+				return 0;
+			} else {
+				omp_set_num_threads(threads_num);
+			}
+		}
 	}
+	catch (const std::exception& e)
+	{
+		std::cerr << "Error parsing options: " << e.what() << std::endl << std::endl;
+		std::cout << options.help() << std::endl;
+		return 1;
+	}
+
+
+
 	if(!sequence)
 	{
 		cerr<<endl<<"Please enter a DNA sequence with -si <AbsPathFile> or -pi <AbsPathFile1> <AbsPathFile2>\n"<<flush;
 		return 0;
 	}
+	
 	if(param.getVSpaced().empty())//Applied default
 	{
 		param.addSpacedQmer("CLARK-S", "1111011101110010111001011011111");
@@ -147,6 +158,7 @@ int main(int argc, char* argv[]) {
 		param.addSpacedQmer("rasbhari_maximizing_sensitivity", "1111110101101011100111011001111");
 		cout << endl << "Applied default spaced seed" << flush;
 	}
+
 	//Creo cartella output se non presente
 	createDirAndSubDir(dir_output);
 
@@ -155,7 +167,7 @@ int main(int argc, char* argv[]) {
 		cout << endl << "Type:" << param.getVSpaced()[i].first << ", Spaced seed: " << param.getVSpaced()[i].second.toString() << flush;
 
 
-// Test for a single spaced seed at a time
+	// Test for a single spaced seed at a time
 	if (test_kind == 0 || test_kind == 2)
 	{
 		cout << endl << "Performing test for a single spaced seed at a time"  << flush;
@@ -174,9 +186,8 @@ int main(int argc, char* argv[]) {
 			}
 		}
 	}
-	////////////////////////////////////////////////////////////////
-// Test for a group of spaced seeds
 
+	// Test for a group of spaced seeds
 	if (test_kind == 1 || test_kind == 2)
 	{
 		cout << endl << "Performing test for multiple spaced seeds at a time"  << flush;
@@ -195,5 +206,10 @@ int main(int argc, char* argv[]) {
 			test_multi.multi_save(param, multi_spaced, dir_output_2);
 		}
 	}
+
 	cout<<"End\n";
+
+
+	return 0;
 }
+
