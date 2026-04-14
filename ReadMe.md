@@ -99,11 +99,13 @@ Paper is available on this [link](https://api.semanticscholar.org/CorpusID:25735
 
 
 ## Citation
-Efficient Hashing of Multiple Spaced Seeds with Application
+
+E. Mian, E. Petrucci, C. Pizzi and M. Comin, "MISSH: Fast Hashing of Multiple Spaced Seeds," in IEEE/ACM Transactions on Computational Biology and Bioinformatics, vol. 21, no. 6, pp. 2330-2339, Nov.-Dec. 2024, doi: 10.1109/TCBB.2024.3467368.
+
 
 Eleonora Miani, Enrico Petrucci, Cinzia Pizzi and Matteo Comin
-
-Accepted at BIOINFORMATICS 2023 - 14th International Conference on Bioinformatics Models, Methods and Algorithms
+Efficient Hashing of Multiple Spaced Seeds with Application
+BIOINFORMATICS 2023 - 14th International Conference on Bioinformatics Models, Methods and Algorithms
 
 ### BibTeX
 ```BibTeX
